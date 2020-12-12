@@ -1,5 +1,12 @@
 /* jshint esversion: 6 */
-let db = [];
+
+// new library: pouchDB
+// https://pouchdb.com/getting-started.html
+// https://github.com/pouchdb/pouchdb-server
+// This would technically sync across systems, 
+// if we installed a back-end database for it.
+
+var db = new PouchDB('customerCRUD_db');
 
 // Util Function for Math.random()
 function getRandomArbitrary(min, max) {
@@ -8,53 +15,54 @@ function getRandomArbitrary(min, max) {
 
 // cat avatars for customers
 function getCatPicture() {
-  return `https://http.cat/${getRandomArbitrary(0, 1000)}`;
+  return `https://http.cat/${getRandomArbitrary(0, 500)}`;
 }
 
-function readCustomers() {
-  return db;
+function showCustomers() {
+  return db.allDocs({include_docs: true, descending: true}, function(err, doc) {
+    return doc.rows;
+  });
 }
 
 function readCustomer(id) {
-  return db.find((customer) => {
-    return customer.id === id;
+  // Searches for ID selector in DB
+  return db.find({
+    selector: {
+      _id: id
+    }
   });
 }
 
-function createCustomer(customerData) {
-  db.push(customerData);
+function createCustomer(newName, newPhone, newAddress, newEmail) {
+  let customer = {
+    _id: new Date().toISOString(),
+    name: newName,
+    phone: newPhone,
+    address: newAddress,
+    email: newEmail
+  };
+
+  db.put(customer, (err, res) => {
+    if (!err) {
+      console.log(`CustomerCRUD: Loaded Data into pouchDB Database Successfully`);
+    }
+  });
+
 }
 
 function updateCustomer(customer) {
-  
-  let foundCustomer = db.find((el) => {
-    return el.id === customer.id;
-  });
-
-  if (foundCustomer) {
-    db[db.findIndex( el => el.id === foundCustomer.id)] = foundCustomer;
-  }
-}
-
-function deleteCustomer(id) {
-  let findCustomer = (el) => {
-    if (el.id === id) {
-      return true;
-    } else {
-      return false;
+  db.put(customer, (err, res) => {
+    if (!err) {
+      console.log(`CustomerCRUD: Updated customer ${customer}`);
     }
-  };
-  db.find(findCustomer);
-  const index = db.findIndex(findCustomer);
-  db.splice(index, 1);
+  });
 }
 
-class Customer {
-  constructor(name, address, phone) {
-    this.name = name;
-    this.address = address;
-    this.phone = phone;
-  }
+db.changes({
+  since: 'now',
+  live: true
+}).on('change', updateCustomer);
 
-  
+function deleteCustomer(customer) {
+  db.remove(customer);
 }
