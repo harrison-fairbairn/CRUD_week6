@@ -1,35 +1,28 @@
 /* jshint esversion: 6 */
-db = {
-  customer: {
-    name: [],
-    address: [],
-    phone: [],
-    email: [],
-  },
-};
+let db = [];
 
 function readCustomers() {
   return db.customer;
 }
 
 function readCustomer(id) {
-  return db.customer.find((customer) => {
+  return db.find((customer) => {
     return customer.id === id;
   });
 }
 
 function createCustomer(customerData) {
-  db.customer.push(customerData);
+  db.push(customerData);
 }
 
 function updateCustomer(customer) {
   
-  let foundCustomer = db.customer.find((el) => {
+  let foundCustomer = db.find((el) => {
     return el.id === customer.id;
   });
 
   if (foundCustomer) {
-    db.customer[db.customer.findIndex( el => el.id === foundCustomer.id)] = foundCustomer;
+    db[db.findIndex( el => el.id === foundCustomer.id)] = foundCustomer;
   }
 }
 
@@ -41,9 +34,9 @@ function deleteCustomer(id) {
       return false;
     }
   };
-  db.customer.find(findCustomer);
-  const index = db.customer.findIndex(findCustomer);
-  db.customer.splice(index, 1);
+  db.find(findCustomer);
+  const index = db.findIndex(findCustomer);
+  db.splice(index, 1);
 }
 
 class Customer {
