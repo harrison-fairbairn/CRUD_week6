@@ -74,9 +74,10 @@ $(document).on('load', () => {
     db.customer.forEach((currCustomer) => {
       // push active data to arrays for display
       display.append(buildTemplate(currCustomer));
-      updateCustomer(customer, currCustomer.editID); // Call functions to add event listeners on new template's buttons for edit and delete
-      deleteCustomer(currCustomer.id, currCustomer.deleteID);
+      const editID = `edit_${currCustomer.id}`;
+      const deleteID = `delete_${currCustomer.id}`;
+      updateCustomer(customer, editID); // Call functions to add event listeners on new template's buttons for edit and delete
+      deleteCustomer(currCustomer.id, deleteID);
     });
   };
-
 });
