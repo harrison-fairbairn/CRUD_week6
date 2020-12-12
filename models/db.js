@@ -29,7 +29,7 @@ function updateCustomer(customer) {
   });
 
   if (foundCustomer) {
-    db.customer[db.customer.findIndex( x => x.id === foundCustomer.id)] = foundCustomer;
+    db.customer[db.customer.findIndex( el => el.id === foundCustomer.id)] = foundCustomer;
   }
 }
 
