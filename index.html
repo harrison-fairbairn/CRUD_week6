@@ -102,11 +102,10 @@
 
         // Template for customer display lines with edit & delete options
         const buildTemplate = (customer, ids) => {
-          db.get(customer).then((doc) => {
-            let currentName = doc.name;
-            let currentPhone = doc.phone;
-            let currentAddress = doc.address;
-            let currentEmail = doc.email;
+            let currentName = customer.name;
+            let currentPhone = customer.phone;
+            let currentAddress = customer.address;
+            let currentEmail = customer.email;
 
             return `
             <li class="list-group-item bg-dark text-white" id="${ids.listItemID}">
@@ -129,9 +128,6 @@
               </div>
             </div>
             </li>`;
-          }).catch((err) => {
-            console.log(err);
-          });
         };
 
         const buildIDs = (customer) => {
@@ -144,18 +140,23 @@
         }
 
         const displayCustomers = () => {
-          db.allDocs({include_docs: true, descending: true}, (err, doc) => {
-            if (!err) {
-              doc.rows.forEach((currCustomer) => {
-                let ids = buildIDs(currCustomer);
-                // push active data to arrays for display
-                display.append(buildTemplate(currCustomer, ids));
-                updateCustomer(currCustomer, ids.itemID, ids.editID); // Call functions to add event listeners on new template's buttons for edit and delete
-                deleteCustomer(currCustomer, ids.listitemID, ids.deleteID);
-              });
-            } else {
-              console.log(err);
-            }
+          db.allDocs({
+            include_docs: true, 
+            descending: true
+          }).then((result) => {
+            // map docs to an array
+            let docs = result.rows.map((row) => {
+              return row.doc;
+            });
+            docs.forEach((currCustomer) => {
+              let ids = buildIDs(currCustomer);
+              // push active data to arrays for display
+              display.append(buildTemplate(currCustomer, ids));
+              updateCustomer(currCustomer, ids.itemID, ids.editID); // Call functions to add event listeners on new template's buttons for edit and delete
+              deleteCustomer(currCustomer, ids.listitemID, ids.deleteID);
+            });
+          }).catch((err) => {
+            console.log(err);
           });
         };
         displayCustomers();

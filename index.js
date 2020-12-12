@@ -24,37 +24,40 @@ function showCustomers() {
   });
 }
 
-function readCustomer(id) {
+function readCustomer(customer) {
   // Searches for ID selector in DB
   return db.find({
     selector: {
-      _id: id
+      _id: customer._id
     }
   });
 }
 
 function createCustomer(newName, newPhone, newAddress, newEmail) {
-  let customer = {
-    _id: new Date().toISOString(),
+  db.post({
     name: newName,
     phone: newPhone,
     address: newAddress,
     email: newEmail
-  };
-
-  db.put(customer, (err, res) => {
-    if (!err) {
-      console.log(`CustomerCRUD: Loaded Data into pouchDB Database Successfully`);
-    }
+  }).then((resp) => {
+    console.log(resp);
+  }).catch((err) => {
+    console.log(err);
   });
-
 }
-
+// Pass object as input, then map to the database to update existing data
 function updateCustomer(customer) {
-  db.put(customer, (err, res) => {
-    if (!err) {
-      console.log(`CustomerCRUD: Updated customer ${customer}`);
-    }
+  // db.get finds the customer in DB
+  db.get(customer._id).then((doc) => {
+    // db.put updates the doc (it can also be used to make a new doc but post is better for that)
+    return db.put({
+      _id: customer._id,
+      _rev: doc.rev,
+      name: customer.name,
+      phone: customer.phone,
+      address: customer.address,
+      email: customer.email
+    });
   });
 }
 
@@ -64,5 +67,9 @@ db.changes({
 }).on('change', updateCustomer);
 
 function deleteCustomer(customer) {
-  db.remove(customer);
+  db.get(customer._id).then((doc) => {
+    db.remove(doc);
+  }).catch((err) => {
+    console.log(err);
+  });
 }
