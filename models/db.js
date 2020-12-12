@@ -2,7 +2,7 @@
 let db = [];
 
 function readCustomers() {
-  return db.customer;
+  return db;
 }
 
 function readCustomer(id) {
