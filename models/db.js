@@ -1,6 +1,11 @@
+/* jshint esversion: 6 */
 db = {
-  customer: [],
-  address: [],
+  customer: {
+    name: [],
+    address: [],
+    phone: [],
+    email: [],
+  },
 };
 
 function readCustomers() {
@@ -13,14 +18,14 @@ function readCustomer(id) {
   });
 }
 
-function createCustomer(customer) {
-  return db.customer.push(customer);
+function createCustomer(customerData) {
+  db.customer.push(customerData);
 }
 
 function updateCustomer(customer) {
   
-  let foundCustomer = db.customer.find((x) => {
-    return x.id === customer.id;
+  let foundCustomer = db.customer.find((el) => {
+    return el.id === customer.id;
   });
 
   if (foundCustomer) {
