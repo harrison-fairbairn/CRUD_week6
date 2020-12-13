@@ -6,7 +6,7 @@
 // This would technically sync across systems, 
 // if we installed a back-end database for it.
 
-var db = new PouchDB('customerCRUD_db');
+const  db = new PouchDB('customerCRUD_db');
 
 // Util Function for Math.random()
 function getRandomArbitrary(min, max) {
@@ -35,28 +35,28 @@ function readCustomer(customer) {
 
 function createCustomer(newName, newPhone, newAddress, newEmail) {
   db.post({
+    _id: newName + newPhone + newAddress + newEmail,
     name: newName,
     phone: newPhone,
     address: newAddress,
     email: newEmail
-  }).then((resp) => {
-    console.log(resp);
-  }).catch((err) => {
-    console.log(err);
   });
 }
 // Pass object as input, then map to the database to update existing data
-function updateCustomer(customer) {
-  // db.get finds the customer in DB
-  db.get(customer._id).then((doc) => {
-    // db.put updates the doc (it can also be used to make a new doc but post is better for that)
-    return db.put({
-      _id: customer._id,
-      _rev: doc.rev,
-      name: customer.name,
-      phone: customer.phone,
-      address: customer.address,
-      email: customer.email
+function updateCustomer(customer, editID, newName, newPhone, newAddress, newEmail) {
+  let editButton = $(`#${editID}`);
+  editButton.on('click', () => {
+    // db.get finds the customer in DB
+    db.get(customer._id, {conflicts: false}).then((doc) => {
+      // db.put updates the doc (it can also be used to make a new doc but post is better for that)
+      return db.put({
+        _id: customer._id,
+        _rev: doc.rev,
+        name: newName,
+        phone: newPhone,
+        address: newAddress,
+        email: newEmail
+      });
     });
   });
 }
@@ -66,10 +66,12 @@ db.changes({
   live: true
 }).on('change', updateCustomer);
 
-function deleteCustomer(customer) {
-  db.get(customer._id).then((doc) => {
-    db.remove(doc);
-  }).catch((err) => {
-    console.log(err);
+function deleteCustomer(customer, listItemID, deleteID) {
+  let deleteButton = $(`#${deleteID}`);
+  deleteButton.on('click', () => {
+    db.get(customer._id).then((doc) => {
+      db.remove(doc);
+      $(`#${listItemID}`).remove();
+    });
   });
 }
