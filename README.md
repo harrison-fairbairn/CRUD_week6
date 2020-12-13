@@ -7,4 +7,4 @@ The idea with this app is to Create, Read, Update, and Delete our inputs from th
 The input Class we have gone with is Customers. Taking multiple arguments such as,
 Name, Phone number, Email address, Home address. Once created the customer information
 is stored in the array and visible on the screen. Of course, if this was an actual system for
-actual customers, we would no be displaying peoples personal information for all to see.
+actual customers, we would not be displaying peoples personal information for all to see.
