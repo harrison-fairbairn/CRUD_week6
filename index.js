@@ -6,7 +6,7 @@
 // This would technically sync across systems, 
 // if we installed a back-end database for it.
 
-var db = new PouchDB('customerCRUD_db');
+const  db = new PouchDB('customerCRUD_db');
 
 // Util Function for Math.random()
 function getRandomArbitrary(min, max) {
@@ -24,37 +24,40 @@ function showCustomers() {
   });
 }
 
-function readCustomer(id) {
+function readCustomer(customer) {
   // Searches for ID selector in DB
   return db.find({
     selector: {
-      _id: id
+      _id: customer._id
     }
   });
 }
 
 function createCustomer(newName, newPhone, newAddress, newEmail) {
-  let customer = {
-    _id: new Date().toISOString(),
+  db.post({
+    _id: newName + newPhone + newAddress + newEmail,
     name: newName,
     phone: newPhone,
     address: newAddress,
     email: newEmail
-  };
-
-  db.put(customer, (err, res) => {
-    if (!err) {
-      console.log(`CustomerCRUD: Loaded Data into pouchDB Database Successfully`);
-    }
   });
-
 }
-
-function updateCustomer(customer) {
-  db.put(customer, (err, res) => {
-    if (!err) {
-      console.log(`CustomerCRUD: Updated customer ${customer}`);
-    }
+// Pass object as input, then map to the database to update existing data
+function updateCustomer(customer, editID, newName, newPhone, newAddress, newEmail) {
+  let editButton = $(`#${editID}`);
+  editButton.on('click', () => {
+    // db.get finds the customer in DB
+    db.get(customer._id, {conflicts: false}).then((doc) => {
+      // db.put updates the doc (it can also be used to make a new doc but post is better for that)
+      return db.put({
+        _id: customer._id,
+        _rev: doc.rev,
+        name: newName,
+        phone: newPhone,
+        address: newAddress,
+        email: newEmail
+      });
+    });
   });
 }
 
@@ -63,6 +66,12 @@ db.changes({
   live: true
 }).on('change', updateCustomer);
 
-function deleteCustomer(customer) {
-  db.remove(customer);
+function deleteCustomer(customer, listItemID, deleteID) {
+  let deleteButton = $(`#${deleteID}`);
+  deleteButton.on('click', () => {
+    db.get(customer._id).then((doc) => {
+      db.remove(doc);
+      $(`#${listItemID}`).remove();
+    });
+  });
 }

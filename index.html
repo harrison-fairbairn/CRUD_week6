@@ -83,92 +83,89 @@
     <script src="./index.js"></script>
 
     <script>
-      // on load stuff
-      $(document).ready(() => {
-        const display = $("#displayCustomers");
-        const customerForm = $("#customerForm");
-        const nameInput = $('#customerNameInput');
-        const phoneInput = $('#customerPhoneInput');
-        const addressInput = $('#customerAddressInput');
-        const emailInput = $('#customerEmailInput');
+      const display = $("#displayCustomers");
+      const customerForm = $("#customerForm");
+      const nameInput = $('#customerNameInput');
+      const phoneInput = $('#customerPhoneInput');
+      const addressInput = $('#customerAddressInput');
+      const emailInput = $('#customerEmailInput');
+      // Template for customer display lines with edit & delete options
+      const buildTemplate = (customer, ids) => {
+          let currentName = customer.name;
+          let currentPhone = customer.phone;
+          let currentAddress = customer.address;
+          let currentEmail = customer.email;
 
-        // function for cleaning out customer inputs
-        function resetCustomerInput() {
-          nameInput.val('');
-          phoneInput.val('');
-          addressInput.val('');
-          emailInput.val('');
-        }
-
-        // Template for customer display lines with edit & delete options
-        const buildTemplate = (customer, ids) => {
-          db.get(customer).then((doc) => {
-            let currentName = doc.name;
-            let currentPhone = doc.phone;
-            let currentAddress = doc.address;
-            let currentEmail = doc.email;
-
-            return `
-            <li class="list-group-item bg-dark text-white" id="${ids.listItemID}">
-            <div class="row">
-              <div class="col-md-4" id="${ids.customerID}"><img src="${getCatPicture()}" class="avatar rounded-large float-left border border-secondary m-2 p-2" alt="Customer Avatar"></div>
-              <div class="col-md-4"></div>  
-              <div class="col-auto text-right p-4">
-                <button type="button" class="btn btn-secondary" id="edit_${ids.editID}"><i class="fas fa-user-edit"></i> Edit</button>
-                <button type="button" class="btn btn-danger" id="del_${ids.deleteID}"><i class="fas fa-trash"></i> Delete</button>
-              </div>
+          return `
+          <li class="list-group-item bg-dark text-white" id="${ids.listItemID}">
+          <div class="row">
+            <div class="col-md-4" id="${ids.customerID}"><img src="${getCatPicture()}" class="avatar rounded-large float-left border border-secondary m-2 p-2" alt="Customer Avatar"></div>
+            <div class="col-md-4"></div>  
+            <div class="col-auto text-right p-4">
+              <button type="button" class="btn btn-secondary" id="${ids.editID}"><i class="fas fa-user-edit"></i> Edit</button>
+              <button type="button" class="btn btn-danger" id="${ids.deleteID}"><i class="fas fa-trash"></i> Delete</button>
             </div>
-            <div class="row">
-              <div class="col-xl">
-                <ul class="list-group">
-                  <li class="list-group-item list-group-item-dark active">Customer: ${currentName}</li>
-                  <li class="list-group-item list-group-item-dark">Phone Number: ${currentPhone}</li>
-                  <li class="list-group-item list-group-item-dark">Address: ${currentAddress}</li>
-                  <li class="list-group-item list-group-item-dark">Email: ${currentEmail}</li>
-                </ul>
-              </div>
+          </div>
+          <div class="row">
+            <div class="col-xl">
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-dark active">Customer: ${currentName}</li>
+                <li class="list-group-item list-group-item-dark">Phone Number: ${currentPhone}</li>
+                <li class="list-group-item list-group-item-dark">Address: ${currentAddress}</li>
+                <li class="list-group-item list-group-item-dark">Email: ${currentEmail}</li>
+              </ul>
             </div>
-            </li>`;
-          }).catch((err) => {
-            console.log(err);
-          });
-        };
+          </div>
+          </li>`;
+      };
 
-        const buildIDs = (customer) => {
-          return {
-            editID : "edit_" + customer._id,
-            deleteID : "delete_" + customer._id,
-            listItemID : "listItem_" + customer._id,
-            customerID : "customer_" + customer._id
-          }
+      // function for cleaning out customer inputs
+      function resetCustomerInput() {
+        nameInput.val('');
+        phoneInput.val('');
+        addressInput.val('');
+        emailInput.val('');
+      }
+
+      const buildIDs = (customer) => {
+        return {
+          editID : "edit_" + customer._id,
+          deleteID : "delete_" + customer._id,
+          listItemID : "listItem_" + customer._id,
+          customerID : "customer_" + customer._id
         }
+      }
 
-        const displayCustomers = () => {
-          db.allDocs({include_docs: true, descending: true}, (err, doc) => {
-            if (!err) {
-              doc.rows.forEach((currCustomer) => {
-                let ids = buildIDs(currCustomer);
-                // push active data to arrays for display
-                display.append(buildTemplate(currCustomer, ids));
-                updateCustomer(currCustomer, ids.itemID, ids.editID); // Call functions to add event listeners on new template's buttons for edit and delete
-                deleteCustomer(currCustomer, ids.listitemID, ids.deleteID);
-              });
-            } else {
-              console.log(err);
-            }
+      const displayCustomers = () => {
+        display.html(''); // Clear out the HTML being used in the display area before refilling it with updated data
+        db.allDocs({
+          include_docs: true, 
+          descending: true
+        }).then((result) => {
+          // map docs to an array
+          let docs = result.rows.map((row) => {
+            return row.doc;
           });
-        };
-        displayCustomers();
-
-        customerForm.on("submit", function(e) {
-          e.preventDefault();
-          createCustomer(nameInput.val(), phoneInput.val(), addressInput.val(), emailInput.val());
-          displayCustomers();
-          resetCustomerInput();
+          docs.forEach((currCustomer) => {
+            let ids = buildIDs(currCustomer);
+            // push active data to arrays for display
+            display.append(buildTemplate(currCustomer, ids));
+            updateCustomer(currCustomer, ids.editID, nameInput.val(), phoneInput.val(), addressInput.val(), emailInput.val()); // Call functions to add event listeners on new template's buttons for edit and delete
+            deleteCustomer(currCustomer, ids.listItemID, ids.deleteID);
+          });
+        }).catch((err) => {
+          console.log(err);
         });
+      };
 
+      customerForm.on("submit", function(e) {
+        e.preventDefault();
+        createCustomer(nameInput.val(), phoneInput.val(), addressInput.val(), emailInput.val());
+        displayCustomers();
+        resetCustomerInput();
       });
-
+      // $(document).on('load', displayCustomers());
+      displayCustomers();
     </script>
   </body>
 </html>
