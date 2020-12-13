@@ -20,18 +20,22 @@ label {
 
 #customerNameInput {
     background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
 }
 
 #customerPhoneInput {
     background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
 }
 
 #customerAddressInput {
     background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
 }
 
 #customerEmailInput {
     background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
 }
 
 span {
