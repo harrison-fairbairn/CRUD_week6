@@ -15,27 +15,13 @@ function getRandomArbitrary(min, max) {
 
 // cat avatars for customers
 function getCatPicture() {
-  return `https://http.cat/${getRandomArbitrary(0, 500)}`;
-}
-
-function showCustomers() {
-  return db.allDocs({include_docs: true, descending: true}, function(err, doc) {
-    return doc.rows;
-  });
-}
-
-function readCustomer(customer) {
-  // Searches for ID selector in DB
-  return db.find({
-    selector: {
-      _id: customer._id
-    }
-  });
+  let size = getRandomArbitrary(0, 500);
+  return `https://placekitten.com/g/${size}/${size}`;
 }
 
 function createCustomer(newName, newPhone, newAddress, newEmail) {
   db.post({
-    _id: newName + newPhone + newAddress + newEmail,
+    _id: newName + getRandomArbitrary(0, 1000).toString(),
     name: newName,
     phone: newPhone,
     address: newAddress,
@@ -43,28 +29,30 @@ function createCustomer(newName, newPhone, newAddress, newEmail) {
   });
 }
 // Pass object as input, then map to the database to update existing data
-function updateCustomer(customer, editID, newName, newPhone, newAddress, newEmail) {
+function updateCustomer(customer, editID) {
   let editButton = $(`#${editID}`);
   editButton.on('click', () => {
+    let newName = nameInput.val();
+    let newPhone = phoneInput.val();
+    let newAddress = addressInput.val();
+    let newEmail = emailInput.val();
     // db.get finds the customer in DB
-    db.get(customer._id, {conflicts: false}).then((doc) => {
-      // db.put updates the doc (it can also be used to make a new doc but post is better for that)
-      return db.put({
+    db.get(customer._id).then((doc) => {
+      let updatedCustomer = {
         _id: customer._id,
-        _rev: doc.rev,
+        _rev: doc._rev,
         name: newName,
         phone: newPhone,
         address: newAddress,
         email: newEmail
-      });
+      }
+      // db.put updates the doc (it can also be used to make a new doc but post is better for that)
+      return db.put(updatedCustomer, {force: true});
     });
+    
+    location.reload();
   });
 }
-
-db.changes({
-  since: 'now',
-  live: true
-}).on('change', updateCustomer);
 
 function deleteCustomer(customer, listItemID, deleteID) {
   let deleteButton = $(`#${deleteID}`);
