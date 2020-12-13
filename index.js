@@ -45,7 +45,7 @@ function updateCustomer(customer, editID) {
         phone: newPhone,
         address: newAddress,
         email: newEmail
-      }
+      };
       // db.put updates the doc (it can also be used to make a new doc but post is better for that)
       return db.put(updatedCustomer, {force: true});
     });
