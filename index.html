@@ -150,7 +150,7 @@
             let ids = buildIDs(currCustomer);
             // push active data to arrays for display
             display.append(buildTemplate(currCustomer, ids));
-            updateCustomer(currCustomer, ids.editID, nameInput.val(), phoneInput.val(), addressInput.val(), emailInput.val()); // Call functions to add event listeners on new template's buttons for edit and delete
+            updateCustomer(currCustomer, ids.editID); // Call functions to add event listeners on new template's buttons for edit and delete
             deleteCustomer(currCustomer, ids.listItemID, ids.deleteID);
           });
         }).catch((err) => {
