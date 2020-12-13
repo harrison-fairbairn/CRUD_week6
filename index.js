@@ -15,18 +15,55 @@ function getRandomArbitrary(min, max) {
 
 // cat avatars for customers
 function getCatPicture() {
-  let size = getRandomArbitrary(0, 500);
+  let size = getRandomArbitrary(32, 500);
   return `https://placekitten.com/g/${size}/${size}`;
 }
 
+function isItAClone(customer) {
+  // let target = db.find({
+  //   selector: {
+  //     name: {$eq: customer.name}
+  //   },
+  //   sort: ['name'],
+  //   limit: 1,
+  // });
+  // if (target.length > 0) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
+  db.allDocs({
+    include_docs: true,
+  }).then((result) => {
+    // map docs to an array
+    let docs = result.rows.map((row) => {
+      return row.doc;
+    });
+
+    docs.find((el) => {
+      if (el.name == customer.name) { // == for loose matches, === for exact
+        return true;
+      } else {
+        return false;
+      }
+    });
+  });
+}
+
 function createCustomer(newName, newPhone, newAddress, newEmail) {
-  db.post({
+  let data = {
     _id: newName + getRandomArbitrary(0, 1000).toString(),
     name: newName,
     phone: newPhone,
     address: newAddress,
     email: newEmail
-  });
+  };
+  if (isItAClone(data)) {
+    // Pop an error message about duplicates here
+    console.log('No clones allowed!');
+  } else {
+    db.post(data);
+  }
 }
 // Pass object as input, then map to the database to update existing data
 function updateCustomer(customer, editID) {
