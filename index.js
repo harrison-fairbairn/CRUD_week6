@@ -19,19 +19,20 @@ function getCatPicture() {
   return `https://placekitten.com/g/${size}/${size}`;
 }
 
+
 function isItAClone(customer) {
-  // let target = db.find({
-  //   selector: {
-  //     name: {$eq: customer.name}
-  //   },
-  //   sort: ['name'],
-  //   limit: 1,
-  // });
-  // if (target.length > 0) {
-  //   return true;
-  // } else {
-  //   return false;
-  // }
+   let target = db.find({
+     selector: {
+      name: {$eq: customer.name}
+    },
+     sort: ['name'],
+    limit: 1,
+   });
+   if (target.length > 0) {
+     return true;
+  } else {
+    return false;
+   }
   db.allDocs({
     include_docs: true,
   }).then((result) => {
@@ -50,6 +51,8 @@ function isItAClone(customer) {
   });
 }
 
+
+// Allows you to create a new customer in the array, with the given inputs for their information 
 function createCustomer(newName, newPhone, newAddress, newEmail) {
   let data = {
     _id: newName + getRandomArbitrary(0, 1000).toString(),
@@ -65,7 +68,7 @@ function createCustomer(newName, newPhone, newAddress, newEmail) {
     db.post(data);
   }
 }
-// Pass object as input, then map to the database to update existing data
+// Pass in object as input, then map to the database to update existing data
 function updateCustomer(customer, editID) {
   let editButton = $(`#${editID}`);
   editButton.on('click', () => {
@@ -91,6 +94,7 @@ function updateCustomer(customer, editID) {
   });
 }
 
+// Deletes a customer from the DATABASE (db array)
 function deleteCustomer(customer, listItemID, deleteID) {
   let deleteButton = $(`#${deleteID}`);
   deleteButton.on('click', () => {

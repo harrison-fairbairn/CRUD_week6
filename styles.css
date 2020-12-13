@@ -3,5 +3,41 @@
 }
 
 .bg-darker {
-  background-color: #272727;
+  background-color: #333333;
+}
+
+.btn-btn-primary:hover {
+    background-color: rgb(red, green, blue);
+}
+
+label {
+    background-color: rgb(48, 83, 138);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+#customerNameInput {
+    background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
+}
+
+#customerPhoneInput {
+    background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
+}
+
+#customerAddressInput {
+    background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
+}
+
+#customerEmailInput {
+    background-color: rgba(188, 196, 174, 0.514);
+    border: #272727;
+}
+
+span {
+    background-color: rgb(240, 206, 247);
 }
